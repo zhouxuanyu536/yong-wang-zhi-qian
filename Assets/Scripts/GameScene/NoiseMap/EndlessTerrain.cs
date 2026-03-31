@@ -150,7 +150,6 @@ public class EndlessTerrain : MonoBehaviour {
                     int lodIndex = 0;
                     for (int i = 0; i < detailLevels.Length - 1; i++)
                     {
-                        
                         if (viewerDstFromNearestEdge > detailLevels[i].visibleDstThreshold)
                         {
                             lodIndex = i + 1;

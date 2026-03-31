@@ -21,7 +21,7 @@ public class GameMultiplayer : NetworkBehaviour
     public NetworkVariable<int> level = new NetworkVariable<int>(1);
     public NetworkVariable<int> playerLevelLoadFinishedCount = new NetworkVariable<int>(0);
     private string playerName = "";
-
+    private const string PLAYER_NAME_KEY = "PlayerName";
     public static bool playMultiplayer = false;
     public static int playSinglePlayerLevel;
     public bool isSpawned;
@@ -36,10 +36,28 @@ public class GameMultiplayer : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
         playerDataNetworkList = new NetworkList<PlayerData>();
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
-        SetPlayerName("Player" + Random.Range(1000, 10000));
+        playerName = PlayerPrefs.GetString(PLAYER_NAME_KEY, null);
 
+        if (string.IsNullOrEmpty(playerName))
+        {
+            // 首次启动，生成新名称
+            playerName = GeneratePlayerName();
+            PlayerPrefs.SetString(PLAYER_NAME_KEY, playerName);
+            PlayerPrefs.Save();
+            Debug.Log($"首次生成玩家名称: {playerName}");
+        }
+        else
+        {
+            Debug.Log($"加载已保存的玩家名称: {playerName}");
+        }
         Audioplay.Instance.CanDestroy = true;
         isInLobbyInitialized = false;
+    }
+
+    private string GeneratePlayerName()
+    {
+        string uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8);
+        return $"Player_{uniqueId}";
     }
 
     private void Start()

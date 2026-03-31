@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -13,7 +15,7 @@ public class LightAdjust : MonoBehaviour
     {
         volume = GetComponent<Volume>();
     }
-
+    
     // Update is called once per frame
     void Update()
     {

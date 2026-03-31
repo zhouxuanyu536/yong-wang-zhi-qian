@@ -140,5 +140,5 @@ Material:
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _darkColor: {r: 0.002212198, g: 0.525202, b: 0.5471698, a: 0}
     - _lightColor: {r: 1, g: 1, b: 1, a: 0}
-    - _offset: {r: 1810.2388, g: 812.0217, b: 0, a: 0}
+    - _offset: {r: 1786.5947, g: 825.69415, b: 0, a: 0}
   m_BuildTextureStacks: []

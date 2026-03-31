@@ -51,19 +51,63 @@ public class GameLobby : NetworkBehaviour
     private async void InitializeUnityAuthenication()
     {
         Debug.Log("isInitialized:" + (UnityServices.State != ServicesInitializationState.Initialized));
-        if (UnityServices.State != ServicesInitializationState.Initialized)
+        // 检查是否已初始化
+        if (UnityServices.State == ServicesInitializationState.Initialized)
         {
-            InitializationOptions initializationOptions = new InitializationOptions();
-            // 清除之前的玩家数据（强制生成新PlayerId）
-            initializationOptions.SetProfile(UnityEngine.Random.Range(1, 10000).ToString());
-            //异步初始化UGS
-            await UnityServices.InitializeAsync(initializationOptions);
-            //完成匿名用户登录
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            Debug.Log("UGS already initialized, PlayerId: " + AuthenticationService.Instance.PlayerId);
         }
-        Debug.Log("playerId:" + AuthenticationService.Instance.PlayerId);
+
+        // 尝试获取已保存的Profile
+        string existingProfile = GetSavedProfile();
+
+        InitializationOptions initializationOptions = new InitializationOptions();
+
+        if (string.IsNullOrEmpty(existingProfile))
+        {
+            // 首次运行，生成新的唯一Profile
+            string newProfile = GenerateUniqueProfile();
+            initializationOptions.SetProfile(newProfile);
+            SaveProfile(newProfile);
+            Debug.Log($"Generated new profile: {newProfile}");
+        }
+        else
+        {
+            // 使用已有的Profile
+            initializationOptions.SetProfile(existingProfile);
+            Debug.Log($"Using existing profile: {existingProfile}");
+        }
+
+        // 初始化UGS
+        await UnityServices.InitializeAsync(initializationOptions);
+
+        // 检查是否已登录
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            Debug.Log($"Signed in successfully, PlayerId: {AuthenticationService.Instance.PlayerId}");
+        }
+        else
+        {
+            Debug.Log($"Already signed in, PlayerId: {AuthenticationService.Instance.PlayerId}");
+        }
+    }
+    private string savedProfileKey = "UnityAuthProfile";
+
+    private string GetSavedProfile()
+    {
+        return PlayerPrefs.GetString(savedProfileKey, null);
+    }
+    
+    private string GenerateUniqueProfile()
+    {
+        return Guid.NewGuid().ToString("N").Substring(0, 12);
     }
 
+    private void SaveProfile(string profile)
+    {
+        PlayerPrefs.SetString(savedProfileKey, profile);
+        PlayerPrefs.Save();
+    }
 
     // Update is called once per frame
     void Update()
